@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright © 2013 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public
-# License as published by the Free Software Foundation; either version
-# 2 of the License (GPLv2) or (at your option) any later version.
-# There is NO WARRANTY for this software, express or implied,
-# including the implied warranties of MERCHANTABILITY,
-# NON-INFRINGEMENT, or FITNESS FOR A PARTICULAR PURPOSE. You should
-# have received a copy of GPLv2 along with this software; if not, see
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
-
 from gettext import gettext as _
 import logging
 import urlparse
@@ -169,7 +156,7 @@ class ModuleHandler(handler.ContentHandler):
 
         # need this so we can easily access original unit objects when constructing
         # new requests below
-        units_by_full_name = dict(('%s/%s'% (u['author'], u['name']), u) for u in units)
+        units_by_full_name = dict(('%s/%s'% (u['author'], u['name']), u) for u in units) # TODO deduplicate me?
 
         # loop over the results, and keep trying to uninstall failed attempts as
         # a dumb but effective way of dealing with dependency-related failures.
@@ -248,7 +235,7 @@ class ModuleHandler(handler.ContentHandler):
 
         for unit in units:
             # prepare the command
-            full_name = '%s/%s' % (unit['author'], unit['name'])
+            full_name = '%s/%s' % (unit['author'], unit['name']) # TODO deduplicate me?
             args = ['puppet', 'module', operation, '--render-as', 'json']
             if forge_url:
                 args.extend(['--module_repository', forge_url])
@@ -264,7 +251,7 @@ class ModuleHandler(handler.ContentHandler):
             try:
                 popen = subprocess.Popen(args, stdout=subprocess.PIPE)
             except OSError:
-                logger.error('"puppet module" tool not found')
+                logger.error(_('"puppet module" tool not found'))
                 errors[full_name] = {'error': '"puppet module" tool not found'}
                 break
 
@@ -275,7 +262,9 @@ class ModuleHandler(handler.ContentHandler):
             if operation_report.get('result') == 'success':
                 num_changes += 1
             if popen.returncode == 0 and 'error' not in operation_report:
-                logger.info('%s of module %s' % (operation, full_name))
+                msg_dict = {'operation': operation, 'module': full_name}
+                msg = _('%(operation)s of module %(module)s') % msg_dict
+                logger.info(msg)
                 successes[full_name] = operation_report
             else:
                 errors[full_name] = operation_report
@@ -309,7 +298,9 @@ class ModuleHandler(handler.ContentHandler):
         # if there was any error trying to parse puppet's JSON output, make
         # an empty report
         except (IndexError, ValueError):
-            logger.warning('failed to parse JSON output from %s of %s' % (operation, full_name))
+            msg_dict = {'opeartion': operation, 'module': full_name}
+            msg = _('failed to parse JSON output from %(operation)s of %(module)s') % msg_dict
+            logger.warning(msg)
             operation_report = {}
         return operation_report
 
@@ -428,7 +419,7 @@ class BindHandler(handler.BindHandler):
         :rtype:  BindReport
         """
         repo_id = binding['repo_id']
-        logger.info('binding to repo %s' % repo_id)
+        logger.info(_('binding to repo %s') % repo_id)
 
         report = BindReport(repo_id)
         report.set_succeeded()

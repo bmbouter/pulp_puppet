@@ -1,17 +1,3 @@
-# -*- coding: utf-8 -*-
-#
-# Copyright © 2012 Red Hat, Inc.
-#
-# This software is licensed to you under the GNU General Public
-# License as published by the Free Software Foundation; either version
-# 2 of the License (GPLv2) or (at your option) any later version.
-# There is NO WARRANTY for this software, express or implied,
-# including the implied warranties of MERCHANTABILITY,
-# NON-INFRINGEMENT, or FITNESS FOR A PARTICULAR PURPOSE. You should
-# have received a copy of GPLv2 along with this software; if not, see
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
-
-
 class InvalidFeed(Exception):
     def __init__(self, feed, *args):
         Exception.__init__(self, feed, *args)
@@ -23,7 +9,6 @@ class UnsupportedFeedType(Exception):
         Exception.__init__(self, feed_type, *args)
         self.feed_type = feed_type
 
-# -- file retrieval exceptions ------------------------------------------------
 
 class FileRetrievalException(Exception):
     """
@@ -52,7 +37,7 @@ class FileNotFoundException(FileRetrievalException):
 
 
 
-class UnauthorizedException(FileRetrievalException):
+class UnauthorizedException(FileRetrievalException): # TODO replace me with a generic 401
     """
     Raised if a file fails to be retrieved because it could not be read
     (e.g. 401 from a web request, no read perms for a local read).
